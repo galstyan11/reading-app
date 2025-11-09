@@ -14,7 +14,7 @@ st.set_page_config(
 @st.cache_data
 def load_data():
     # Use the raw GitHub URL of your CSV file
-    url = "https://raw.githubusercontent.com/galstyan11/reading_app/main/reading_app_db.csv"
+    url = "https://raw.githubusercontent.com/galstyan11/reading-app/refs/heads/main/app.py"
     
     try:
         # Read CSV directly from GitHub
