@@ -14,11 +14,15 @@ st.set_page_config(
 @st.cache_data
 def load_data():
     # Use the raw GitHub URL of your CSV file
-    url = "https://raw.githubusercontent.com/galstyan11/reading-app/refs/heads/main/app.py"
+    url = "https://raw.githubusercontent.com/galstyan11/reading-app/main/reading_app_db.csv"
     
     try:
-        # Read CSV directly from GitHub
-        df = pd.read_csv(url)
+        # Read CSV directly from GitHub with proper encoding for BOM
+        df = pd.read_csv(url, encoding='utf-8-sig')
+        
+        # Clean column names (remove BOM and whitespace)
+        df.columns = df.columns.str.strip()
+        
         st.success("✅ Data loaded successfully!")
         return df
     except Exception as e:
