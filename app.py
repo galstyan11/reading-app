@@ -1,39 +1,10 @@
 import streamlit as st
 import pandas as pd
-import json
-import hashlib
-from datetime import datetime
-import os
-
-# Import our new file-based modules
 from modules.auth_file import show_auth_page, get_current_user, logout
 from modules.books_csv import load_books, show_all_books, show_recommendations, show_reading_plan
 from modules.users_file import show_statistics, show_reminders, show_settings
 from modules.creative_file import show_creative_works
-
-def main():
-    st.set_page_config(
-        page_title="📖 Ընթերցանության Հավելված", 
-        page_icon="📚",
-        layout="wide"
-    )
-    
-    # Initialize session state
-    if 'user' not in st.session_state:
-        st.session_state.user = None
-    if 'page' not in st.session_state:
-        st.session_state.page = "login"
-    if 'link_status' not in st.session_state:
-        st.session_state.link_status = {}
-    
-    # Load books data
-    books_df = load_books()
-    
-    # Navigation
-    if st.session_state.user is None:
-        show_auth_page(books_df)
-    else:
-        show_main_app(books_df)
+from modules.utils import get_reading_time_recommendation, calculate_reading_plan
 
 def show_main_app(books_df):
     user = st.session_state.user
@@ -80,6 +51,30 @@ def show_main_app(books_df):
     
     with tab7:
         show_settings(user, books_df)
+
+def main():
+    st.set_page_config(
+        page_title="📖 Ընթերցանության Հավելված", 
+        page_icon="📚",
+        layout="wide"
+    )
+    
+    # Initialize session state
+    if 'user' not in st.session_state:
+        st.session_state.user = None
+    if 'page' not in st.session_state:
+        st.session_state.page = "login"
+    if 'link_status' not in st.session_state:
+        st.session_state.link_status = {}
+    
+    # Load books data
+    books_df = load_books()
+    
+    # Navigation
+    if st.session_state.user is None:
+        show_auth_page(books_df)
+    else:
+        show_main_app(books_df)
 
 if __name__ == "__main__":
     main()
