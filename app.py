@@ -1,17 +1,42 @@
 import streamlit as st
-from modules.database import create_tables_if_not_exist, get_connection
-from modules.auth import show_auth_page, hash_password, create_user, verify_user, get_user
-from modules.books import show_all_books, show_recommendations, show_reading_plan
-from modules.users import show_statistics, show_reminders, show_settings
-from modules.creative import show_creative_works
+import pandas as pd
+import json
+import hashlib
+from datetime import datetime
+import os
 
-def show_main_app():
-    user = st.session_state.user
+# Import our new file-based modules
+from modules.auth_file import show_auth_page, get_current_user, logout
+from modules.books_csv import load_books, show_all_books, show_recommendations, show_reading_plan
+from modules.users_file import show_statistics, show_reminders, show_settings
+from modules.creative_file import show_creative_works
+
+def main():
+    st.set_page_config(
+        page_title="📖 Ընթերցանության Հավելված", 
+        page_icon="📚",
+        layout="wide"
+    )
+    
+    # Initialize session state
+    if 'user' not in st.session_state:
+        st.session_state.user = None
+    if 'page' not in st.session_state:
+        st.session_state.page = "login"
+    if 'link_status' not in st.session_state:
+        st.session_state.link_status = {}
+    
+    # Load books data
     books_df = load_books()
     
-    # Check for reminders
-    if check_reminder_time(user['id']):
-        st.toast("🔔 Ընթերցման Ժամանակն է! Մոտենում է ձեր ընթերցման ժամանակը։", icon="📚")
+    # Navigation
+    if st.session_state.user is None:
+        show_auth_page(books_df)
+    else:
+        show_main_app(books_df)
+
+def show_main_app(books_df):
+    user = st.session_state.user
     
     # Header with user info and logout
     col1, col2, col3 = st.columns([3, 1, 1])
@@ -19,8 +44,7 @@ def show_main_app():
         st.title(f"📖 Բարի Գալուստ, {user['username']}!")
     with col3:
         if st.button("🚪 Դուրս Գալ"):
-            st.session_state.user = None
-            st.session_state.page = "login"
+            logout()
             st.rerun()
     
     st.markdown("---")
@@ -55,33 +79,7 @@ def show_main_app():
         show_reminders(user)
     
     with tab7:
-        show_settings(user)
-
-def main():
-    st.set_page_config(
-        page_title="📖 Ընթերցանության Հավելված", 
-        page_icon="📚",
-        layout="wide"
-    )
-    
-    # Initialize session state
-    if 'user' not in st.session_state:
-        st.session_state.user = None
-    if 'page' not in st.session_state:
-        st.session_state.page = "login"
-    if 'link_status' not in st.session_state:
-        st.session_state.link_status = {}
-    if 'last_reminder_check' not in st.session_state:
-        st.session_state.last_reminder_check = None
-    
-    # Create tables if they don't exist
-    create_tables_if_not_exist()
-    
-    # Navigation
-    if st.session_state.user is None:
-        show_auth_page()
-    else:
-        show_main_app()
+        show_settings(user, books_df)
 
 if __name__ == "__main__":
     main()
