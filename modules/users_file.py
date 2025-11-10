@@ -2,7 +2,7 @@ import streamlit as st
 import json
 import os
 from datetime import datetime
-from modules.data_file import get_user_sessions, add_reminder, get_user_reminder, check_reminder_time
+from modules.mysql_data import get_user_sessions, add_reminder, get_user_reminder, check_reminder_time
 from modules.utils import calculate_reading_plan
 
 def show_statistics(user):
