@@ -6,6 +6,13 @@ from modules.users_file import show_statistics, show_reminders, show_settings
 from modules.creative_file import show_creative_works
 from modules.utils import get_reading_time_recommendation, calculate_reading_plan
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+print("DB_HOST:", os.getenv('DB_HOST'))
+print("DB_USER:", os.getenv('DB_USER'))
+
 def show_main_app(books_df):
     user = st.session_state.user
     
